@@ -34,7 +34,7 @@ func part2(input []int) int {
 }
 
 func main() {
-	f, _ := os.Open("input.txt")
+	f, _ := os.Open("input/day01.txt")
 
 	scanner := bufio.NewScanner(bufio.NewReader(f))
 	input := make([]int, 0, 1000)

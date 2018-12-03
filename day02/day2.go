@@ -56,7 +56,7 @@ func part2(input []string) string {
 }
 
 func main() {
-	f, _ := os.Open("input.txt")
+	f, _ := os.Open("input/day02.txt")
 
 	scanner := bufio.NewScanner(bufio.NewReader(f))
 	input := make([]string, 0, 250)
