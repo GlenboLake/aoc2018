@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 type Coordinate struct {
 	X, Y int
@@ -11,6 +14,24 @@ func (c Coordinate) String() string {
 }
 
 const SERIAL = 9005
+
+func sumAreaTable(serial int) map[Coordinate]int {
+	table := map[Coordinate]int{}
+	for x := 1; x <= 300; x++ {
+		rack := x + 10
+		for y := 1; y <= 300; y++ {
+			table[Coordinate{x, y}] = (rack*y+serial)*rack/100%10 - 5 +
+				table[Coordinate{x - 1, y}] + table[Coordinate{x, y - 1}] -
+				table[Coordinate{x - 1, y - 1}]
+		}
+	}
+	return table
+}
+
+func getSquare(areaTable map[Coordinate]int, x, y, size int) int {
+	return areaTable[Coordinate{x - 1, y - 1}] + areaTable[Coordinate{x + size - 1, y + size - 1}] -
+		areaTable[Coordinate{x - 1, y + size - 1}] - areaTable[Coordinate{x + size - 1, y - 1}]
+}
 
 func power(serial int) map[Coordinate]int {
 	powers := map[Coordinate]int{}
@@ -98,8 +119,44 @@ func part2(serial int) Square {
 	return bestSquare
 }
 
+func faster(serial int) (string, string) {
+	table := sumAreaTable(serial)
+
+	var bestX1, bestY1, bestValue1 int
+	for x := 1; x <= 298; x++ {
+		for y := 1; y <= 298; y++ {
+			value := getSquare(table, x, y, 3)
+			if value > bestValue1 {
+				bestX1, bestY1, bestValue1 = x, y, value
+			}
+		}
+	}
+
+	var bestX2, bestY2, bestSize, bestValue2 int
+	for size := 1; size <= 300; size++ {
+		for x := 1; x <= 301-size; x++ {
+			for y := 1; y <= 301-size; y++ {
+				value := getSquare(table, x, y, size)
+				if value > bestValue2 {
+					bestX2, bestY2, bestSize, bestValue2 = x, y, size, value
+				}
+			}
+		}
+	}
+	return fmt.Sprintf("%d,%d", bestX1, bestY1), fmt.Sprintf("%d,%d,%d", bestX2, bestY2, bestSize)
+}
+
 func main() {
+	start := time.Now()
 	resetCache()
 	fmt.Println(part1(SERIAL))
 	fmt.Println(part2(SERIAL))
+	fmt.Println("Method 1:", time.Now().Sub(start))
+
+	// method 2
+	start = time.Now()
+	p1, p2 := faster(SERIAL)
+	fmt.Println(p1)
+	fmt.Println(p2)
+	fmt.Println("Method 2:", time.Now().Sub(start))
 }
