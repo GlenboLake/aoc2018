@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"sort"
-	"strings"
 )
 
 const (
@@ -160,15 +159,6 @@ func collision(carts *[]Cart, ignore map[*Cart]bool) bool {
 	return false
 }
 
-func trackWithCarts(track []string, carts []Cart) string {
-	t := make([]string, len(track))
-	copy(t, track)
-	for _, c := range carts {
-		t[c.y] = t[c.y][:c.x] + dirName(c.dir) + t[c.y][c.x+1:]
-	}
-	return strings.Join(t, "\n")
-}
-
 func part1(track []string, carts []Cart) string {
 
 	for {
@@ -182,14 +172,7 @@ func part1(track []string, carts []Cart) string {
 }
 
 func part2(track []string, carts []Cart) string {
-
-	//for _, r := range track {
-	//	fmt.Println(r)
-	//}
-	//fmt.Println(carts)
-
 	for len(carts) > 1 {
-		fmt.Printf("Looking at %d carts\n", len(carts))
 		removed := map[*Cart]bool{}
 		for i := range sortCarts(carts) {
 			if removed[&carts[i]] {
@@ -198,7 +181,6 @@ func part2(track []string, carts []Cart) string {
 			tick(&carts[i], track)
 			if collision(&carts, removed) {
 				x, y := carts[i].x, carts[i].y
-				fmt.Println("Collision at", x, y)
 				found := 0
 				newCarts := make([]Cart, len(carts)-2)
 				for j := 0; j < len(carts); j++ {
@@ -209,11 +191,9 @@ func part2(track []string, carts []Cart) string {
 						newCarts = append(newCarts, carts[j])
 					}
 				}
-				fmt.Println("Found", found)
 			}
 		}
 		if len(removed) > 0 {
-			fmt.Printf("Removing %d carts\n", len(removed))
 			remaining := make([]Cart, 0, len(carts)-len(removed))
 			for i, c := range carts {
 				if !removed[&carts[i]] {
@@ -239,16 +219,6 @@ func main() {
 	p1Carts := make([]Cart, len(carts))
 	copy(p1Carts, carts)
 	fmt.Println(part1(track, p1Carts))
-
-	//input = []string{
-	//	`/>-<\  `,
-	//	`|   |  `,
-	//	`| /<+-\`,
-	//	`| | | v`,
-	//	`\>+</ |`,
-	//	`  |   ^`,
-	//	`  \<->/`,
-	//}
 
 	fmt.Println(part2(track, carts))
 }
