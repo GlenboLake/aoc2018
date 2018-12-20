@@ -226,7 +226,7 @@ func main() {
 		scanner.Scan()
 		fmt.Sscanf(scanner.Text(), "After: [%d, %d, %d, %d]", &after[0], &after[1], &after[2], &after[3])
 		scanner.Scan()
-		cases = append(cases, Case{before, after, opCode, a, b, c})
+		cases = append(cases, Case{Before: before, After: after, OpCode: opCode, A: a, B: b, C: c})
 	}
 	var program []Instruction
 	for scanner.Scan() {
@@ -235,7 +235,7 @@ func main() {
 		}
 		var op, a, b, c int
 		fmt.Sscanf(scanner.Text(), "%d %d %d %d", &op, &a, &b, &c)
-		program = append(program, Instruction{op, a, b, c})
+		program = append(program, Instruction{OpCode: op, A: a, B: b, C: c})
 	}
 
 	fmt.Println(part1(cases))

@@ -24,11 +24,11 @@ func (u Unit) String() string {
 }
 
 func NewElf(loc aoc2018.Coord, attackPower int) Unit {
-	return Unit{"E", loc, attackPower, 200}
+	return Unit{Type: "E", Loc: loc, Attack: attackPower, HP: 200}
 }
 
 func NewGoblin(loc aoc2018.Coord) Unit {
-	return Unit{"G", loc, 3, 200}
+	return Unit{Type: "G", Loc: loc, Attack: 3, HP: 200}
 }
 
 func (u Unit) ChooseTarget(m Map) *Unit {

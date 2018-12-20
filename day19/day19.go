@@ -157,7 +157,7 @@ func main() {
 		var inst string
 		var a, b, c int
 		fmt.Sscanf(scanner.Text(), "%s %d %d %d", &inst, &a, &b, &c)
-		program = append(program, Instruction{inst, a, b, c})
+		program = append(program, Instruction{OpCode: inst, A: a, B: b, C: c})
 	}
 
 	fmt.Println(part1(ip, program))

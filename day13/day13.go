@@ -123,7 +123,7 @@ func parseCarts(track []string) ([]string, []Cart) {
 			} else {
 				continue
 			}
-			carts = append(carts, Cart{j, i, d, LEFT})
+			carts = append(carts, Cart{x: j, y: i, dir: d, nextTurn: LEFT})
 		}
 	}
 	return track, carts
@@ -149,7 +149,7 @@ func collision(carts *[]Cart, ignore map[*Cart]bool) bool {
 		if ignore[&(*carts)[i]] {
 			continue
 		}
-		p := Pos{c.x, c.y}
+		p := Pos{x: c.x, y: c.y}
 		if positions[p] {
 			return true
 		} else {

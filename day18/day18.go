@@ -95,7 +95,7 @@ func tickRow(row, above, below string, rowNum int, results chan<- caHelper) {
 			}
 		}
 	}
-	results <- caHelper{rowNum, string(result)}
+	results <- caHelper{rowNum: rowNum, result: string(result)}
 }
 
 func part1(area CollectionArea) int {

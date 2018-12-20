@@ -15,7 +15,7 @@ type Marble struct {
 func play(numPlayers, numMarbles int) int {
 	players := make([]int, numPlayers)
 	currentPlayer := 0
-	current := &Marble{0, nil, nil}
+	current := &Marble{}
 	current.next = current
 	current.prev = current
 	for i := 1; i <= numMarbles; i++ {
@@ -28,7 +28,7 @@ func play(numPlayers, numMarbles int) int {
 		} else {
 			before := current.next
 			after := before.next
-			insert := &Marble{i, after, before}
+			insert := &Marble{id: i, next: after, prev: before}
 			before.next = insert
 			after.prev = insert
 			current = insert

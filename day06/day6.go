@@ -84,11 +84,11 @@ func part1(input []Point) int {
 		}
 	}
 	for y := top; y <= bottom; y++ {
-		c = findClosest(Point{left, y}, input)
+		c = findClosest(Point{X: left, Y: y}, input)
 		if c != NoPoint {
 			infinite[c] = true
 		}
-		c = findClosest(Point{right, y}, input)
+		c = findClosest(Point{X: right, Y: y}, input)
 		if c != NoPoint {
 			infinite[c] = true
 		}
@@ -101,7 +101,7 @@ func part1(input []Point) int {
 	}
 	for x := left; x < right; x++ {
 		for y := top; y < bottom; y++ {
-			c = findClosest(Point{x, y}, input)
+			c = findClosest(Point{X: x, Y: y}, input)
 			if c != NoPoint && infinite[c] == false {
 				areas[c] += 1
 			}
@@ -140,7 +140,7 @@ func part2(input []Point, threshold int) int {
 	area := 0
 	for x := minX; x <= maxX; x++ {
 		for y := minY; y <= maxY; y++ {
-			p := Point{x, y}
+			p := Point{X: x, Y: y}
 			total := 0
 			for _, i := range input {
 				total += manhattan(p, i)
@@ -165,12 +165,12 @@ func main() {
 	}
 
 	sample := []Point{
-		{1, 1},
-		{1, 6},
-		{8, 3},
-		{3, 4},
-		{5, 5},
-		{8, 9},
+		{X: 1, Y: 1},
+		{X: 1, Y: 6},
+		{X: 8, Y: 3},
+		{X: 3, Y: 4},
+		{X: 5, Y: 5},
+		{X: 8, Y: 9},
 	}
 
 	fmt.Println(part1(input))

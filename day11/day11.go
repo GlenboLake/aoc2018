@@ -13,17 +13,17 @@ func sumAreaTable(serial int) map[aoc2018.Coord]int {
 	for x := 1; x <= 300; x++ {
 		rack := x + 10
 		for y := 1; y <= 300; y++ {
-			table[aoc2018.Coord{x, y}] = (rack*y+serial)*rack/100%10 - 5 +
-				table[aoc2018.Coord{x - 1, y}] + table[aoc2018.Coord{x, y - 1}] -
-				table[aoc2018.Coord{x - 1, y - 1}]
+			table[aoc2018.Coord{X: x, Y: y}] = (rack*y+serial)*rack/100%10 - 5 +
+				table[aoc2018.Coord{X: x - 1, Y: y}] + table[aoc2018.Coord{X: x, Y: y - 1}] -
+				table[aoc2018.Coord{X: x - 1, Y: y - 1}]
 		}
 	}
 	return table
 }
 
 func getSquare(areaTable map[aoc2018.Coord]int, x, y, size int) int {
-	return areaTable[aoc2018.Coord{x - 1, y - 1}] + areaTable[aoc2018.Coord{x + size - 1, y + size - 1}] -
-		areaTable[aoc2018.Coord{x - 1, y + size - 1}] - areaTable[aoc2018.Coord{x + size - 1, y - 1}]
+	return areaTable[aoc2018.Coord{X: x - 1, Y: y - 1}] + areaTable[aoc2018.Coord{X: x + size - 1, Y: y + size - 1}] -
+		areaTable[aoc2018.Coord{X: x - 1, Y: y + size - 1}] - areaTable[aoc2018.Coord{X: x + size - 1, Y: y - 1}]
 }
 
 func power(serial int) map[aoc2018.Coord]int {
@@ -33,7 +33,7 @@ func power(serial int) map[aoc2018.Coord]int {
 		for y := 1; y <= 300; y++ {
 			power := (rack*y + serial) * rack
 			power = power / 100 % 10
-			powers[aoc2018.Coord{x, y}] = power - 5
+			powers[aoc2018.Coord{X: x, Y: y}] = power - 5
 		}
 	}
 	return powers
@@ -57,15 +57,15 @@ func calcGridPower(grid map[aoc2018.Coord]int, square Square) int {
 	power, ok := powerCache[square]
 	if !ok {
 		if square.Size == 1 {
-			power = grid[aoc2018.Coord{square.X, square.Y}]
+			power = grid[aoc2018.Coord{X: square.X, Y: square.Y}]
 		} else if square.Size < 1 {
 			return 0
 		} else {
-			power = calcGridPower(grid, Square{square.X, square.Y, square.Size - 1}) +
-				calcGridPower(grid, Square{square.X + 1, square.Y + 1, square.Size - 1}) +
-				calcGridPower(grid, Square{square.X + square.Size - 1, square.Y, 1}) +
-				calcGridPower(grid, Square{square.X, square.Y + square.Size - 1, 1}) -
-				calcGridPower(grid, Square{square.X + 1, square.Y + 1, square.Size - 2})
+			power = calcGridPower(grid, Square{X: square.X, Y: square.Y, Size: square.Size - 1}) +
+				calcGridPower(grid, Square{X: square.X + 1, Y: square.Y + 1, Size: square.Size - 1}) +
+				calcGridPower(grid, Square{X: square.X + square.Size - 1, Y: square.Y, Size: 1}) +
+				calcGridPower(grid, Square{X: square.X, Y: square.Y + square.Size - 1, Size: 1}) -
+				calcGridPower(grid, Square{X: square.X + 1, Y: square.Y + 1, Size: square.Size - 2})
 		}
 		powerCache[square] = power
 	}
@@ -80,9 +80,9 @@ func part1(serial int) aoc2018.Coord {
 
 	for x := 1; x < 299; x++ {
 		for y := 1; y < 299; y++ {
-			value := calcGridPower(grid, Square{x, y, 3})
+			value := calcGridPower(grid, Square{X: x, Y: y, Size: 3})
 			if value > bestValue {
-				bestPos = aoc2018.Coord{x, y}
+				bestPos = aoc2018.Coord{X: x, Y: y}
 				bestValue = value
 			}
 		}
@@ -100,7 +100,7 @@ func part2(serial int) Square {
 	for size := 1; size <= 300; size++ {
 		for x := 1; x < 301-size; x++ {
 			for y := 1; y < 301-size; y++ {
-				square := Square{x, y, size}
+				square := Square{X: x, Y: y, Size: size}
 				value := calcGridPower(grid, square)
 				if value > bestValue {
 					bestSquare = square

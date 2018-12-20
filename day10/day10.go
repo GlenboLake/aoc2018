@@ -76,7 +76,7 @@ func skyText(stars []*Particle) string {
 	skyText := ""
 	for y := ymin; y <= ymax; y++ {
 		for x := xmin; x <= xmax; x++ {
-			if sky[Vector{x, y}] {
+			if sky[Vector{x: x, y: y}] {
 				skyText += "#"
 			} else {
 				skyText += " "
@@ -120,8 +120,8 @@ func main() {
 		vx, _ := strconv.Atoi(strings.TrimSpace(scanner.Text()[36:38]))
 		vy, _ := strconv.Atoi(strings.TrimSpace(scanner.Text()[40:42]))
 		input = append(input, &Particle{
-			Vector{px, py},
-			Vector{vx, vy},
+			position: Vector{x: px, y: py},
+			velocity: Vector{x: vx, y: vy},
 		})
 	}
 
