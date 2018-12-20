@@ -3,118 +3,14 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/glenbolake/aoc2018"
 	"os"
 )
-
-type Op func(A, B, C int, regs []int)
-
-type Instruction struct {
-	OpCode  int
-	A, B, C int
-}
 
 func copyRegs(registers []int) []int {
 	result := make([]int, len(registers))
 	copy(result, registers)
 	return result
-}
-
-func addr(A, B, C int, regs []int) {
-	regs[C] = regs[A] + regs[B]
-}
-
-func addi(A, B, C int, regs []int) {
-	regs[C] = regs[A] + B
-}
-
-func mulr(A, B, C int, regs []int) {
-	regs[C] = regs[A] * regs[B]
-}
-
-func muli(A, B, C int, regs []int) {
-	regs[C] = regs[A] * B
-}
-
-func banr(A, B, C int, regs []int) {
-	regs[C] = regs[A] & regs[B]
-}
-
-func bani(A, B, C int, regs []int) {
-	regs[C] = regs[A] & B
-}
-
-func borr(A, B, C int, regs []int) {
-	regs[C] = regs[A] | regs[B]
-}
-
-func bori(A, B, C int, regs []int) {
-	regs[C] = regs[A] | B
-}
-
-func setr(A, _, C int, regs []int) {
-	regs[C] = regs[A]
-}
-
-func seti(A, _, C int, regs []int) {
-	regs[C] = A
-}
-
-func gtir(A, B, C int, regs []int) {
-	if A > regs[B] {
-		regs[C] = 1
-	} else {
-		regs[C] = 0
-	}
-}
-
-func gtri(A, B, C int, regs []int) {
-	if regs[A] > B {
-		regs[C] = 1
-	} else {
-		regs[C] = 0
-	}
-}
-
-func gtrr(A, B, C int, regs []int) {
-	if regs[A] > regs[B] {
-		regs[C] = 1
-	} else {
-		regs[C] = 0
-	}
-}
-
-func eqir(A, B, C int, regs []int) {
-	if A == regs[B] {
-		regs[C] = 1
-	} else {
-		regs[C] = 0
-	}
-}
-
-func eqri(A, B, C int, regs []int) {
-	if regs[A] == B {
-		regs[C] = 1
-	} else {
-		regs[C] = 0
-	}
-}
-
-func eqrr(A, B, C int, regs []int) {
-	if regs[A] == regs[B] {
-		regs[C] = 1
-	} else {
-		regs[C] = 0
-	}
-}
-
-var AllOps = []Op{
-	addr, addi,
-	mulr, muli,
-	banr, bani,
-	borr, bori,
-	setr, seti,
-	gtir, gtri, gtrr,
-	eqir, eqri, eqrr,
 }
 
 type Case struct {
@@ -124,7 +20,7 @@ type Case struct {
 
 func (c Case) Test() map[int]bool {
 	options := map[int]bool{}
-	for i, op := range AllOps {
+	for i, op := range aoc2018.OpList {
 		if c.testOp(op) {
 			options[i] = true
 		}
@@ -132,7 +28,7 @@ func (c Case) Test() map[int]bool {
 	return options
 }
 
-func (c Case) testOp(op Op) bool {
+func (c Case) testOp(op aoc2018.Op) bool {
 	regCopy := copyRegs(c.Before)
 	op(c.A, c.B, c.C, regCopy)
 	for i := range regCopy {
@@ -153,8 +49,8 @@ func part1(cases []Case) int {
 	return count
 }
 
-func mapOpCodes(cases []Case) map[int]Op {
-	opCodes := map[int]Op{}
+func mapOpCodes(cases []Case) map[int]aoc2018.Op {
+	opCodes := map[int]aoc2018.Op{}
 
 	possibilities := map[int][]int{}
 	list := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}
@@ -191,18 +87,18 @@ func mapOpCodes(cases []Case) map[int]Op {
 	}
 
 	for k, v := range possibilities {
-		opCodes[k] = AllOps[v[0]]
+		opCodes[k] = aoc2018.OpList[v[0]]
 	}
 
 	return opCodes
 }
 
-func part2(cases []Case, program []Instruction) int {
+func part2(cases []Case, program []aoc2018.Instruction) int {
 	opMap := mapOpCodes(cases)
 
 	registers := make([]int, 4)
 	for _, inst := range program {
-		opMap[inst.OpCode](inst.A, inst.B, inst.C, registers)
+		opMap[inst.OpIndex](inst.A, inst.B, inst.C, registers)
 	}
 
 	return registers[0]
@@ -228,14 +124,14 @@ func main() {
 		scanner.Scan()
 		cases = append(cases, Case{Before: before, After: after, OpCode: opCode, A: a, B: b, C: c})
 	}
-	var program []Instruction
+	var program []aoc2018.Instruction
 	for scanner.Scan() {
 		if scanner.Text() == "" {
 			continue
 		}
 		var op, a, b, c int
 		fmt.Sscanf(scanner.Text(), "%d %d %d %d", &op, &a, &b, &c)
-		program = append(program, Instruction{OpCode: op, A: a, B: b, C: c})
+		program = append(program, aoc2018.Instruction{OpIndex: op, A: a, B: b, C: c})
 	}
 
 	fmt.Println(part1(cases))
