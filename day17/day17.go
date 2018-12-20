@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/glenbolake/aoc2018"
 	"math"
 	"os"
 	"regexp"
@@ -16,10 +17,6 @@ const (
 	FLOWING = '|'
 	STILL   = '~'
 )
-
-type Coord struct {
-	Row, Col int
-}
 
 func Min(x, y int) int {
 	if x < y {
@@ -70,47 +67,47 @@ func isSolid(r rune) bool {
 	}
 }
 
-func flowWater(clay map[Coord]bool) Scan {
+func flowWater(clay map[aoc2018.Coord]bool) Scan {
 	xMax := 0
 	yMin := math.MaxInt32
 	yMax := 0
 	for c := range clay {
-		if c.Col > xMax {
-			xMax = c.Col
+		if c.X > xMax {
+			xMax = c.X
 		}
-		if c.Row < yMin {
-			yMin = c.Row
+		if c.Y < yMin {
+			yMin = c.Y
 		}
-		if c.Row > yMax {
-			yMax = c.Row
+		if c.Y > yMax {
+			yMax = c.Y
 		}
 	}
 	scan := make(Scan, yMax+1)
 	for row := range scan {
 		scan[row] = make([]rune, xMax+2)
 		for col := range scan[row] {
-			if clay[Coord{row, col}] {
+			if clay[aoc2018.Coord{Y: row, X: col}] {
 				scan[row][col] = CLAY
 			} else {
 				scan[row][col] = SAND
 			}
 		}
 	}
-	sources := []Coord{{0, 500}}
+	sources := []aoc2018.Coord{{X: 500}}
 	scan[0][500] = '+'
 
 	for len(sources) > 0 {
-		var newSources []Coord
+		var newSources []aoc2018.Coord
 		for _, source := range sources {
-			row := source.Row
-			col := source.Col
+			row := source.Y
+			col := source.X
 			if row == yMax {
 				continue
 			}
 			switch scan[row+1][col] {
 			case SAND:
 				scan[row+1][col] = FLOWING
-				newSources = append(newSources, Coord{row + 1, col})
+				newSources = append(newSources, aoc2018.Coord{Y: row + 1, X: col})
 			case CLAY, STILL:
 				// See how far the water will flow left and right
 				left := col
@@ -127,7 +124,7 @@ func flowWater(clay map[Coord]bool) Scan {
 					for i := left + 1; i < right; i++ {
 						scan[row][i] = STILL
 					}
-					newSources = append(newSources, Coord{row - 1, col})
+					newSources = append(newSources, aoc2018.Coord{Y: row - 1, X: col})
 				} else {
 					// Otherwise, it will be filled with flowing water in both directions. The side(s) with
 					// no wall will become sources that will flow down next tick.
@@ -136,11 +133,11 @@ func flowWater(clay map[Coord]bool) Scan {
 					}
 					if !isSolid(scan[row][left]) {
 						scan[row][left] = FLOWING
-						newSources = append(newSources, Coord{row, left})
+						newSources = append(newSources, aoc2018.Coord{Y: row, X: left})
 					}
 					if !isSolid(scan[row][right]) {
 						scan[row][right] = FLOWING
-						newSources = append(newSources, Coord{row, right})
+						newSources = append(newSources, aoc2018.Coord{Y: row, X: right})
 					}
 				}
 			}
@@ -151,15 +148,15 @@ func flowWater(clay map[Coord]bool) Scan {
 	return scan
 }
 
-func part1(clay map[Coord]bool) int {
+func part1(clay map[aoc2018.Coord]bool) int {
 	yMin := math.MaxInt32
 	yMax := 0
 	for c := range clay {
-		if c.Row < yMin {
-			yMin = c.Row
+		if c.Y < yMin {
+			yMin = c.Y
 		}
-		if c.Row > yMax {
-			yMax = c.Row
+		if c.Y > yMax {
+			yMax = c.Y
 		}
 	}
 	scan := flowWater(clay)
@@ -171,15 +168,15 @@ func part1(clay map[Coord]bool) int {
 	return total
 }
 
-func part2(clay map[Coord]bool) int {
+func part2(clay map[aoc2018.Coord]bool) int {
 	yMin := math.MaxInt32
 	yMax := 0
 	for c := range clay {
-		if c.Row < yMin {
-			yMin = c.Row
+		if c.Y < yMin {
+			yMin = c.Y
 		}
-		if c.Row > yMax {
-			yMax = c.Row
+		if c.Y > yMax {
+			yMax = c.Y
 		}
 	}
 	scan := flowWater(clay)
@@ -194,7 +191,7 @@ func main() {
 	f, _ := os.Open("input/day17.txt")
 
 	scanner := bufio.NewScanner(bufio.NewReader(f))
-	clay := map[Coord]bool{}
+	clay := map[aoc2018.Coord]bool{}
 	var xMin, xMax, yMin, yMax int
 	xMin = math.MaxInt32
 	yMin = math.MaxInt32
@@ -206,7 +203,7 @@ func main() {
 		max, _ := strconv.Atoi(result[4])
 		if result[1] == "x" {
 			for y := min; y <= max; y++ {
-				clay[Coord{y, single}] = true
+				clay[aoc2018.Coord{Y: y, X: single}] = true
 			}
 			xMin = Min(xMin, single)
 			xMax = Max(xMax, single)
@@ -214,7 +211,7 @@ func main() {
 			yMax = Max(yMax, max)
 		} else {
 			for x := min; x <= max; x++ {
-				clay[Coord{single, x}] = true
+				clay[aoc2018.Coord{Y: single, X: x}] = true
 			}
 			xMin = Min(xMin, min)
 			xMax = Max(xMax, max)

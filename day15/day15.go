@@ -3,36 +3,18 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/glenbolake/aoc2018"
 	"math"
 	"os"
 	"sort"
 	"strings"
 )
 
-func Abs(x int) int {
-	if x < 0 {
-		return -x
-	}
-	return x
-}
-
-type Coord struct {
-	X, Y int
-}
-
-func (c Coord) DistTo(other Coord) int {
-	return Abs(c.X-other.X) + Abs(c.Y-other.Y)
-}
-
-var NOWHERE = Coord{}
-
-func (c Coord) String() string {
-	return fmt.Sprintf("(%d,%d)", c.X, c.Y)
-}
+var NOWHERE = aoc2018.Coord{}
 
 type Unit struct {
 	Type   string
-	Loc    Coord
+	Loc    aoc2018.Coord
 	Attack int
 	HP     int
 }
@@ -41,11 +23,11 @@ func (u Unit) String() string {
 	return fmt.Sprintf("%s%s[%d]", u.Type, u.Loc, u.HP)
 }
 
-func NewElf(loc Coord, attackPower int) Unit {
+func NewElf(loc aoc2018.Coord, attackPower int) Unit {
 	return Unit{"E", loc, attackPower, 200}
 }
 
-func NewGoblin(loc Coord) Unit {
+func NewGoblin(loc aoc2018.Coord) Unit {
 	return Unit{"G", loc, 3, 200}
 }
 
@@ -75,7 +57,7 @@ func (u Unit) ChooseTarget(m Map) *Unit {
 
 type Map struct {
 	Units  []*Unit
-	Spaces map[Coord]bool
+	Spaces map[aoc2018.Coord]bool
 }
 
 func (m Map) String() string {
@@ -90,7 +72,7 @@ func (m Map) String() string {
 	}
 	width := maxX + 2
 	height := maxY + 2
-	units := map[Coord]Unit{}
+	units := map[aoc2018.Coord]Unit{}
 	for _, u := range m.SortedUnits() {
 		units[u.Loc] = *u
 	}
@@ -98,7 +80,7 @@ func (m Map) String() string {
 	for row := 0; row < height; row++ {
 		var rowSummary []string
 		for col := 0; col < width; col++ {
-			coord := Coord{col, row}
+			coord := aoc2018.Coord{col, row}
 			if m.Spaces[coord] {
 				if u, ok := units[coord]; ok {
 					s += u.Type
@@ -133,9 +115,9 @@ func (m *Map) Remove(unit *Unit) {
 	}
 }
 
-func (m Map) FreeSpaces() map[Coord]bool {
-	freeSpaces := map[Coord]bool{}
-	unitSpaces := map[Coord]bool{}
+func (m Map) FreeSpaces() map[aoc2018.Coord]bool {
+	freeSpaces := map[aoc2018.Coord]bool{}
+	unitSpaces := map[aoc2018.Coord]bool{}
 	for _, u := range m.SortedUnits() {
 		unitSpaces[u.Loc] = true
 	}
@@ -177,7 +159,7 @@ func (m Map) TotalHP() int {
 }
 
 // If a unit is supposed to move, analyze the map to determine which space it should move to.
-func (m Map) FindMovement(unit Unit) Coord {
+func (m Map) FindMovement(unit Unit) aoc2018.Coord {
 	// Check for adjacent enemies
 	for _, u := range m.SortedUnits() {
 		if unit.Type != u.Type && unit.Loc.DistTo(u.Loc) == 1 {
@@ -186,7 +168,7 @@ func (m Map) FindMovement(unit Unit) Coord {
 	}
 	// Build an A* map
 	distanceFromUnit := m.Travel(unit.Loc)
-	var adjacent []Coord
+	var adjacent []aoc2018.Coord
 	for coord, dist := range distanceFromUnit {
 		if dist == 1 {
 			adjacent = append(adjacent, coord)
@@ -202,7 +184,7 @@ func (m Map) FindMovement(unit Unit) Coord {
 	nearEnemies := m.SpacesNearEnemies(unit)
 
 	// Figure out the target square to walk towards
-	var targets []Coord
+	var targets []aoc2018.Coord
 	distance := math.MaxInt32
 	for space := range nearEnemies {
 		dist, ok := distanceFromUnit[space]
@@ -212,13 +194,13 @@ func (m Map) FindMovement(unit Unit) Coord {
 		}
 		if dist < distance {
 			distance = dist
-			targets = []Coord{space}
+			targets = []aoc2018.Coord{space}
 		} else if dist == distance {
 			targets = append(targets, space)
 		}
 	}
 	if len(targets) == 0 {
-		return Coord{}
+		return aoc2018.Coord{}
 	}
 	sort.Slice(targets, func(i, j int) bool {
 		if targets[i].Y == targets[j].Y {
@@ -243,16 +225,16 @@ func (m Map) FindMovement(unit Unit) Coord {
 	return rv
 }
 
-func (m Map) Travel(coord Coord) map[Coord]int {
+func (m Map) Travel(coord aoc2018.Coord) map[aoc2018.Coord]int {
 	freeSpaces := m.FreeSpaces()
-	rv := map[Coord]int{coord: 0}
-	lastGen := map[Coord]bool{coord: true}
+	rv := map[aoc2018.Coord]int{coord: 0}
+	lastGen := map[aoc2018.Coord]bool{coord: true}
 	value := 0
 	for len(lastGen) > 0 {
 		value += 1
-		nextGen := map[Coord]bool{}
+		nextGen := map[aoc2018.Coord]bool{}
 		for coord := range lastGen {
-			spaces := []Coord{
+			spaces := []aoc2018.Coord{
 				{coord.X, coord.Y - 1},
 				{coord.X, coord.Y + 1},
 				{coord.X - 1, coord.Y},
@@ -273,7 +255,7 @@ func (m Map) Travel(coord Coord) map[Coord]int {
 	return rv
 }
 
-func (m Map) SpacesNearEnemies(unit Unit) map[Coord]bool {
+func (m Map) SpacesNearEnemies(unit Unit) map[aoc2018.Coord]bool {
 	var enemyTeam string
 	if unit.Type == "E" {
 		enemyTeam = "G"
@@ -285,22 +267,22 @@ func (m Map) SpacesNearEnemies(unit Unit) map[Coord]bool {
 
 	freeSpaces := m.FreeSpaces()
 	units := m.SortedUnits()
-	rv := map[Coord]bool{}
+	rv := map[aoc2018.Coord]bool{}
 	for _, enemy := range units {
 		if enemy.Type != enemyTeam {
 			continue
 		}
-		if freeSpaces[Coord{enemy.Loc.X, enemy.Loc.Y - 1}] {
-			rv[Coord{enemy.Loc.X, enemy.Loc.Y - 1}] = true
+		if freeSpaces[aoc2018.Coord{enemy.Loc.X, enemy.Loc.Y - 1}] {
+			rv[aoc2018.Coord{enemy.Loc.X, enemy.Loc.Y - 1}] = true
 		}
-		if freeSpaces[Coord{enemy.Loc.X, enemy.Loc.Y + 1}] {
-			rv[Coord{enemy.Loc.X, enemy.Loc.Y + 1}] = true
+		if freeSpaces[aoc2018.Coord{enemy.Loc.X, enemy.Loc.Y + 1}] {
+			rv[aoc2018.Coord{enemy.Loc.X, enemy.Loc.Y + 1}] = true
 		}
-		if freeSpaces[Coord{enemy.Loc.X - 1, enemy.Loc.Y}] {
-			rv[Coord{enemy.Loc.X - 1, enemy.Loc.Y}] = true
+		if freeSpaces[aoc2018.Coord{enemy.Loc.X - 1, enemy.Loc.Y}] {
+			rv[aoc2018.Coord{enemy.Loc.X - 1, enemy.Loc.Y}] = true
 		}
-		if freeSpaces[Coord{enemy.Loc.X + 1, enemy.Loc.Y}] {
-			rv[Coord{enemy.Loc.X + 1, enemy.Loc.Y}] = true
+		if freeSpaces[aoc2018.Coord{enemy.Loc.X + 1, enemy.Loc.Y}] {
+			rv[aoc2018.Coord{enemy.Loc.X + 1, enemy.Loc.Y}] = true
 		}
 	}
 	return rv
@@ -360,17 +342,17 @@ func part2(input []string) int {
 
 func parseMap(input []string, elfAttack int) Map {
 	dungeon := Map{}
-	dungeon.Spaces = map[Coord]bool{}
+	dungeon.Spaces = map[aoc2018.Coord]bool{}
 	for y, line := range input {
 		for x, ch := range line {
 			if ch != '#' {
-				dungeon.Spaces[Coord{x, y}] = true
+				dungeon.Spaces[aoc2018.Coord{x, y}] = true
 			}
 			if ch == 'E' {
-				elf := NewElf(Coord{x, y}, elfAttack)
+				elf := NewElf(aoc2018.Coord{x, y}, elfAttack)
 				dungeon.Units = append(dungeon.Units, &elf)
 			} else if ch == 'G' {
-				goblin := NewGoblin(Coord{x, y})
+				goblin := NewGoblin(aoc2018.Coord{x, y})
 				dungeon.Units = append(dungeon.Units, &goblin)
 			}
 		}
