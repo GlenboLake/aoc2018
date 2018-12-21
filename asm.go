@@ -1,11 +1,15 @@
 package aoc2018
 
-type Op func(A, B, C int, regs []int)
+type OpFunc func(A, B, C int, regs []int)
 
 type Instruction struct {
 	OpIndex int
-	OpCode  string
+	Op      OpFunc
 	A, B, C int
+}
+
+func (i Instruction) Execute(registers []int) {
+	i.Op(i.A, i.B, i.C, registers)
 }
 
 func addr(A, B, C int, regs []int) {
@@ -96,7 +100,7 @@ func eqrr(A, B, C int, regs []int) {
 	}
 }
 
-var AllOps = map[string]Op{
+var AllOps = map[string]OpFunc{
 	"addr": addr, "addi": addi,
 	"mulr": mulr, "muli": muli,
 	"banr": banr, "bani": bani,
@@ -106,7 +110,7 @@ var AllOps = map[string]Op{
 	"eqir": eqir, "eqri": eqri, "eqrr": eqrr,
 }
 
-var OpList = []Op{
+var OpList = []OpFunc{
 	addr, addi,
 	mulr, muli,
 	banr, bani,

@@ -28,7 +28,7 @@ func (c Case) Test() map[int]bool {
 	return options
 }
 
-func (c Case) testOp(op aoc2018.Op) bool {
+func (c Case) testOp(op aoc2018.OpFunc) bool {
 	regCopy := copyRegs(c.Before)
 	op(c.A, c.B, c.C, regCopy)
 	for i := range regCopy {
@@ -49,8 +49,8 @@ func part1(cases []Case) int {
 	return count
 }
 
-func mapOpCodes(cases []Case) map[int]aoc2018.Op {
-	opCodes := map[int]aoc2018.Op{}
+func mapOpCodes(cases []Case) map[int]aoc2018.OpFunc {
+	opCodes := map[int]aoc2018.OpFunc{}
 
 	possibilities := map[int][]int{}
 	list := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}
@@ -95,10 +95,13 @@ func mapOpCodes(cases []Case) map[int]aoc2018.Op {
 
 func part2(cases []Case, program []aoc2018.Instruction) int {
 	opMap := mapOpCodes(cases)
+	for i := 0; i < len(program); i++ {
+		program[i].Op = opMap[program[i].OpIndex]
+	}
 
 	registers := make([]int, 4)
 	for _, inst := range program {
-		opMap[inst.OpIndex](inst.A, inst.B, inst.C, registers)
+		inst.Execute(registers)
 	}
 
 	return registers[0]

@@ -14,7 +14,7 @@ func part1(ip int, program []aoc2018.Instruction) int {
 			return registers[1]
 		}
 		inst := program[registers[ip]]
-		aoc2018.AllOps[inst.OpCode](inst.A, inst.B, inst.C, registers)
+		inst.Execute(registers)
 		registers[ip] += 1
 	}
 	return 0
@@ -34,7 +34,7 @@ func part2(ip int, program []aoc2018.Instruction) int {
 			}
 		}
 		inst := program[registers[ip]]
-		aoc2018.AllOps[inst.OpCode](inst.A, inst.B, inst.C, registers)
+		inst.Execute(registers)
 		registers[ip] += 1
 	}
 }
@@ -51,7 +51,7 @@ func main() {
 		var inst string
 		var a, b, c int
 		fmt.Sscanf(scanner.Text(), "%s %d %d %d", &inst, &a, &b, &c)
-		program = append(program, aoc2018.Instruction{OpCode: inst, A: a, B: b, C: c})
+		program = append(program, aoc2018.Instruction{Op: aoc2018.AllOps[inst], A: a, B: b, C: c})
 	}
 
 	fmt.Println(part1(ip, program))
